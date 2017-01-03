@@ -1,0 +1,740 @@
+\documentclass{article}
+
+\usepackage{geometry}
+\usepackage{float}
+\usepackage{longtable,booktabs}
+
+\geometry{left=2cm,right=2cm,top=2cm,bottom=2cm}
+
+\title{Instruction Set Architecture Specification}
+\date{}
+\author{}
+\begin{document}
+\maketitle
+
+\section{Architectural Registers}
+
+    \subsection{General Purpose Registers}
+
+    \begin{table}[H]
+    \centering
+    \caption{List of General Purpose Registers}
+    \label{table:gpr}
+    \begin{tabular}{|c|c|c|c|}
+    \hline Name &   Alias   &   Description         &   Permission \\
+    \hline r0   &   zero    &   Hard-wired to zero  &   Reserved, Read/Write value ignored without exception \\
+    \hline r1   &   r1      &   Program             &   Read/Write \\
+    \hline r2   &   r2      &   Program             &   Read/Write \\
+    \hline r3   &   r3      &   Program             &   Read/Write \\
+    \hline r4   &   r4      &   Program             &   Read/Write \\
+    \hline r5   &   r5      &   Program             &   Read/Write \\
+    \hline r6   &   r6      &   Program             &   Read/Write \\
+    \hline r7   &   r7      &   Program             &   Read/Write \\
+    \hline r8   &   r8      &   Program             &   Read/Write \\
+    \hline r9   &   r9      &   Program             &   Read/Write \\
+    \hline r10  &   r10     &   Program             &   Read/Write \\
+    \hline r11  &   r11     &   Program             &   Read/Write \\
+    \hline r12  &   r12     &   Program             &   Read/Write \\
+    \hline r13  &   r13     &   Program             &   Read/Write \\
+    \hline r14  &   r14     &   Program             &   Read/Write \\
+    \hline r15  &   r15     &   Program             &   Read/Write \\
+    \hline r16  &   r16     &   Program             &   Read/Write \\
+    \hline r17  &   r17     &   Program             &   Read/Write \\
+    \hline r18  &   r18     &   Program             &   Read/Write \\
+    \hline r19  &   r19     &   Program             &   Read/Write \\
+    \hline r20  &   r20     &   Program             &   Read/Write \\
+    \hline r21  &   r21     &   Program             &   Read/Write \\
+    \hline r22  &   r22     &   Program             &   Read/Write \\
+    \hline r23  &   r23     &   Program             &   Read/Write \\
+    \hline r24  &   r24     &   Program             &   Read/Write \\
+    \hline r25  &   r25     &   Program             &   Read/Write \\
+    \hline r26  &   r26     &   Program             &   Read/Write \\
+    \hline r27  &   ra      &   Return address      &   Reserved, Read/Write \\
+    \hline r28  &   gp      &   Global pointer      &   Reserved, Read/Write \\
+    \hline r29  &   tp      &   Thread pointer      &   Reserved, Read/Write \\
+    \hline r30  &   fp      &   Frame pointer       &   Reserved, Read/Write \\
+    \hline r31  &   sp      &   Stack pointer       &   Reserved, Read/Write \\
+    \hline
+    \end{tabular}
+    \end{table}
+    
+    Note: IP (instruction pointer) is not a general purpose register.
+    
+    \subsection{Special Purpose Registers}
+        
+    \begin{table}[H]
+    \centering
+    \caption{List of Special Purpose Registers}
+    \label{table:spr}
+    \begin{tabular}{|c|c|c|c|c|}
+    \hline Name &   Alias           &   Mnemonic        &   Description                 &   Permission \\
+    \hline s0   &   status      &   stat            &   Processor status            &   Read in S/U, Write in S \\
+    \hline s1   &   version     &   ver         &   Processor version           &   Read in S/U \\
+    \hline s2   &   multiprocessor  &   mp          &   Multiprocessor information  &   Read in S/U \\
+    \hline s3   &   cycles      &   cycle       &   Cycle counter       &   Read in S/U \\
+    \hline s4   &   timer           &   tmr         &   Timer (decrement by 1 per cycle)        &   Read/Write in S/U \\
+    \hline s5   &   int\_ip         &   iip         &   Interrupt handler IP        &   Read/Write in S \\
+    \hline s6   &   int\_sp         &   isp         &   Interrupt handler SP        &   Read/Write in S \\
+    \hline s7   &   int\_status     &   istat       &   Interrupt handler processor status  &   Read/Write in S \\
+    \hline s8   &   exp\_ip         &   eip         &   Exception handler IP        &   Read/Write in S \\
+    \hline s9   &   exp\_sp         &   esp         &   Exception handler SP        &   Read/Write in S \\
+    \hline s10  &   exp\_status     &   estat       &   Exception handler processor status  &   Read/Write in S \\  
+    \hline s11  &   syscall\_ip     &   cip         &   Syscall handler IP      &   Read/Write in S \\
+    \hline s12  &   syscall\_sp     &   csp         &   Syscall handler SP      &   Read/Write in S \\
+    \hline s13  &   syscall\_status &   cstat       &   Syscall handler processor status    &   Read/Write in S \\      
+    \hline s14  &   trap\_ip        &   tip         &   Trap handler IP     &   Read/Write in S \\
+    \hline s15  &   trap\_sp        &   tsp         &   Trap handler SP     &   Read/Write in S \\
+    \hline s16  &   trap\_status    &   tstat       &   Trap handler processor status   &   Read/Write in S \\      
+    \hline s17  &   saved\_ip       &   sip         &   IP when interrupt occurs    &   Read/Write in S \\
+    \hline s18  &   saved\_sp       &   ssp         &   SP when interrupt occurs    &   Read/Write in S \\
+    \hline s19  &   saved\_status   &   sstat       &   Processor status when interrupt occurs  &   Read/Write in S \\
+    \hline s20  &   int\_mask       &   imsk            &   Interrupt mask              &   Read in S \\
+    \hline s21  &   int\_vector     &   ivec            &   Interrupt vector            &   Read in S \\
+    \hline s22  &   int\_cause1     &   icau1       &   First cause of interrupt    &   Read in S \\
+    \hline s23  &   int\_cause2     &   icau2       &   Second cause of interrupt   &   Read in S \\
+    \hline s24  &   int\_cause3     &   icau3       &   Third cause of interrupt    &   Read in S \\    
+    \hline s25  &   page\_base      &   pb          &   Page table base address &   Read/Write in S \\  
+    \hline s26  &   inst\_ptr       &   ip          &   Instruction pointer &   Read in S/U \\  
+    \hline s27  &   reserved        &   reserv      &   Reserved for future use &   Not allowed \\  
+    \hline s28  &   reserved        &   reserv      &   Reserved for future use &   Not allowed \\  
+    \hline s29  &   reserved        &   reserv      &   Reserved for future use &   Not allowed \\  
+    \hline s30  &   reserved        &   reserv      &   Reserved for future use &   Not allowed \\  
+    \hline s31  &   feature1        &   fe1         &   Processor feature   &   Read/Write in S \\  
+    \hline
+    \end{tabular}
+    \end{table}
+    
+    Note:  S = Supervisor, U = User \\
+    Illeagel reads and writes rasie exceptions in both S and U
+
+    \newpage
+
+\section{Interrupts, Exceptions, and Syscalls}
+
+    \subsection{Interrupt Vector}
+    
+    \begin{table}[H]
+    \centering
+    \caption{Interrupt Vector Encoding}
+    \label{table:int_vec}
+    \begin{tabular}{|l|l|r|l|r|c|}
+    
+    \hline                          &   \multicolumn{1}{|l}{63/31}  &   4   &   \multicolumn{1}{|l}{3}  &   0       &   Description \\
+    \hline Native Interrupt         &   \multicolumn{2}{|c|}{Index}         &   \multicolumn{2}{|c|}{Type: 00 00}       &   Native predefined device interrupt vectors  \\
+    \hline Inter-Processor Interrupt    &   \multicolumn{2}{|c|}{Index}         &   \multicolumn{2}{|c|}{Type: 01 00}       &   Inter-processor interrupt vectors   \\  
+    \hline Dynamic Interrupt            &   \multicolumn{2}{|c|}{Index}         &   \multicolumn{2}{|c|}{Type: 10 00}       &   Dynamiccally allocated interrupt vectors    \\
+    \hline User Exception           &   \multicolumn{2}{|c|}{Index}         &   \multicolumn{2}{|c|}{Type: 00 01}       &   Traps generated by exceptions in user mode  \\
+    \hline Supservisor Exception        &   \multicolumn{2}{|c|}{Index}         &   \multicolumn{2}{|c|}{Type: 01 01}       &   Traps generated by exceptions    in supervisor mode \\
+    \hline Trap                     &   \multicolumn{2}{|c|}{Index}         &   \multicolumn{2}{|c|}{Type: 00 10}       &   Traps generated by the trap instruction \\
+    \hline Sysenter                 &   \multicolumn{2}{|c|}{Index}         &   \multicolumn{2}{|c|}{Type: 00 11}       &   Traps generated by the sysenter instruction \\
+    
+    \hline
+    \end{tabular}
+    \end{table}
+
+    \subsection{Native Interrupts}
+    
+    \begin{table}[H]
+    \centering
+    \caption{List of Native Interrupts}
+    \label{table:native_int}
+    \begin{tabular}{|l|c|c|c|}
+    
+    \hline Name         & Index     & Mnemonic  & Descrption    \\
+    \hline Local Timer  & 0000      & tmr       & Local timer \\
+    \hline Keyboard     & 0001      & kb            & Keyboard \\
+    \hline Serial Port  & 0010      & serial        & Serial port \\
+    \hline Hard Drive   & 0011      & hd            & Hard drive \\
+
+    \hline
+    \end{tabular}
+    \end{table}
+    
+    \subsection{Exceptions} 
+    
+    \begin{table}[H]
+    \centering
+    \caption{List of Exceptions}
+    \label{table:except}
+    \begin{tabular}{|l|c|c|c|c|}
+    
+    \hline Name             & Category      & Index     & Mnemonic  & Descrption    \\
+    \hline Invalid Opcode   & Instruction   & 00 0000   & IO            & Invalid opcode \\
+    \hline Divide-by-Zero   & Integer       & 00 0001   & DZ            & Interger divided by zero \\
+    \hline Overflow         & Integer       & 01 0001   & OF            & Integer overflow \\
+    \hline Underflow            & Integer       & 10 0001   & UF            & Integer underflow \\
+    \hline Out-of-Range     & Memory            & 00 0010   & OR            & Array index out of range \\
+    \hline Page Fault       & Memory            & 01 0010   & PF            & Page fault \\
+    \hline Bad Alignment        & Memory            & 10 0010   & BA            & Bad alignment \\
+    \hline Protected Instr  & Protection        & 00 0011   & PI            & User executing supervisor instructions \\
+    \hline Protected Mem        & Protection        & 01 0011   & PM            & Accessing memory with a higher privilige \\
+    \hline No Execution     & Protection        & 10 0011   & NE            & Executing instructions from a non-execution address \\
+    \hline FPU not Ready        & Floating-point    & 00 0100   & FNR       & FPU not ready, lazy FP context switch \\
+    \hline VPU not Ready        & Floating-point    & 01 0100   & VNR       & Vector unit not ready, lazy vector context switch \\
+    
+    \hline
+    \end{tabular}
+    \end{table}
+    
+    \newpage
+    
+    
+\section{Instruction Types}
+
+    \begin{table}[H]
+    \centering
+    \caption{List of Instruction Types}
+    \label{table:inst_type}
+    \begin{tabular}{|l|l|r|l|r|l|r|l|r|l|r|l|r|l|r|l|r|}
+
+
+    \hline  & \multicolumn{1}{l}{31} & 27       & \multicolumn{1}{l}{26} & 22   & \multicolumn{1}{l}{21} & 17       & \multicolumn{1}{l}{16} & 12       & \multicolumn{1}{l}{11} & 6    & \multicolumn{1}{l}{5} & 3     & \multicolumn{2}{|c|}{2}           & \multicolumn{1}{l}{1} & 0 \\
+    \hline R4M  & \multicolumn{2}{|c|}{Dest High/1} & \multicolumn{2}{|c|}{Src 1}   & \multicolumn{2}{|c|}{Src 2}       & \multicolumn{2}{|c|}{Dest Low/2}  & \multicolumn{2}{|c|}{Func}    & \multicolumn{2}{|c|}{Opcode}  & \multicolumn{2}{|c|}{Sub Type: 0} & \multicolumn{2}{|c|}{Type: 00} \\
+    \hline R4C  & \multicolumn{2}{|c|}{Dest}        & \multicolumn{2}{|c|}{Src 1}   & \multicolumn{2}{|c|}{Src 2}       & \multicolumn{2}{|c|}{Cond}        & \multicolumn{2}{|c|}{Func}    & \multicolumn{2}{|c|}{Opcode}  & \multicolumn{2}{|c|}{Sub Type: 0} & \multicolumn{2}{|c|}{Type: 00} \\
+    \hline R0F  & \multicolumn{10}{|c|}{Func}       & \multicolumn{2}{|c|}{Opcode}  & \multicolumn{2}{|c|}{Sub Type: 0} & \multicolumn{2}{|c|}{Type: 00} \\
+    \hline R0I  & \multicolumn{10}{|c|}{Imm [25:0]} & \multicolumn{2}{|c|}{Opcode}  & \multicolumn{2}{|c|}{Sub Type: 1} & \multicolumn{2}{|c|}{Type: 00} \\ 
+
+    \hline  \multicolumn{16}{c}{} \\
+
+    \hline  & \multicolumn{1}{l}{31} & 27       & \multicolumn{9}{l}{26} & 7            & \multicolumn{1}{l}{6} & 2     & \multicolumn{1}{l}{1} & 0 \\
+    \hline R1B  & \multicolumn{2}{|c|}{Base}        & \multicolumn{10}{|c|}{Offset [20:0]}      & \multicolumn{2}{|c|}{Func}    & \multicolumn{2}{|c|}{Type: 01} \\
+    \hline R1M  & \multicolumn{2}{|c|}{Base}        & \multicolumn{10}{|c|}{Offset [20:0]}      & \multicolumn{2}{|c|}{Func}    & \multicolumn{2}{|c|}{Type: 01} \\
+    \hline R1L  & \multicolumn{2}{|c|}{Dest}        & \multicolumn{10}{|c|}{Imm [Long+19:0]}    & \multicolumn{2}{|c|}{Func}    & \multicolumn{2}{|c|}{Type: 01} \\
+    \hline I1D  & \multicolumn{12}{|c|}{Imm [0+Long+42:20]} & \multicolumn{2}{|c|}{Func:11111}  & \multicolumn{2}{|c|}{Type: 01} \\
+    \hline I1T  & \multicolumn{12}{|c|}{Imm [1+66:43]}      & \multicolumn{2}{|c|}{Func:11111}  & \multicolumn{2}{|c|}{Type: 01} \\
+    
+    \hline
+    \end{tabular}
+    \end{table}
+    
+    \newpage
+    
+
+\section{Instruction Types}
+
+    \begin{table}[H]
+    \centering
+    \caption{List of Instruction Types}
+    \label{table:inst_type_old}
+    \begin{tabular}{|l|l|r|l|r|l|r|l|r|l|r|l|r|l|r|c|}
+
+    \hline      &   \multicolumn{9}{l}{31}  &   10              &   \multicolumn{1}{l}{9}   &   4   &   \multicolumn{1}{l}{3}   &   1   &   0 \\
+    \hline R0   &   \multicolumn{10}{|c|}{Imm/Offset [21:0]}    &   \multicolumn{2}{|c|}{Func}      &   \multicolumn{2}{|c|}{Type: 000} &   Long \\
+    
+    \hline          \multicolumn{16}{c}{} \\
+
+    
+    \hline      &   \multicolumn{1}{l}{31}  &   27      &   \multicolumn{7}{l}{26}  &   10          &   \multicolumn{1}{l}{9}   &   4   &   \multicolumn{1}{l}{3}   &   1   &   0 \\
+    \hline R1A  &   \multicolumn{2}{|c|}{Src/Base}      &   \multicolumn{8}{|c|}{Imm/Offset [16:0]} &   \multicolumn{2}{|c|}{Func}      &   \multicolumn{2}{|c|}{Type: 001} &   Long \\
+    
+    %\hline         &   \multicolumn{1}{l}{31}  &   27      &   \multicolumn{7}{l}{26}  &   10      &   \multicolumn{1}{l}{9}   &   4       &   \multicolumn{1}{l}{3}   &   1   &   0 \\
+    \hline R1B  &   \multicolumn{2}{|c|}{Dest}          &   \multicolumn{8}{|c|}{Imm [16:0]}    &   \multicolumn{2}{|c|}{Func: 10xxxx}  &   \multicolumn{2}{|c|}{Type: 001} &   Long \\
+
+    %\hline         &   \multicolumn{1}{l}{31}  &   27      &   \multicolumn{7}{l}{26}  &   10      &   \multicolumn{1}{l}{9}   &   4       &   \multicolumn{1}{l}{3}   &   1   &   0 \\
+    \hline R1C  &   \multicolumn{2}{|c|}{Dest/Src}      &   \multicolumn{8}{|c|}{Imm [16:0]}    &   \multicolumn{2}{|c|}{Func: 10xxxx}  &   \multicolumn{2}{|c|}{Type: 001} &   Long \\
+
+    %\hline         &   \multicolumn{13}{l}{31} &   1               &   0 \\
+    \hline I1D  &   \multicolumn{14}{|c|}{Imm/Offset [47:17]}   &   Long \\
+    
+    %\hline         &   \multicolumn{13}{l}{31} &   1               &   0 \\
+    \hline I1T  &   \multicolumn{14}{|c|}{Imm/Offset 78:48]}    &   Long: 0 \\
+    
+    \hline          \multicolumn{16}{c}{} \\
+    
+    
+    \hline      &   \multicolumn{1}{l}{31}  &   27      &   \multicolumn{1}{l}{26}  &   22  &   \multicolumn{5}{l}{21}  &   10          &   \multicolumn{1}{l}{9}   &   4   &   \multicolumn{1}{l}{3}   &   1   &   0 \\
+    \hline R2A  &   \multicolumn{2}{|c|}{Dest}          &   \multicolumn{2}{|c|}{Src/Base}  &   \multicolumn{6}{|c|}{Imm/Offset [11:0]} &   \multicolumn{2}{|c|}{Func}      &   \multicolumn{2}{|c|}{Type: 010} &   Long \\
+    
+    %\hline         &   \multicolumn{1}{l}{31}  &   27      &   \multicolumn{1}{l}{26}  &   22  &   \multicolumn{5}{l}{21}  &   10      &   \multicolumn{1}{l}{9}   &   4           &   \multicolumn{1}{l}{3}   &   1   &   0 \\
+    \hline R2B  &   \multicolumn{2}{|c|}{Base}          &   \multicolumn{2}{|c|}{Src}       &   \multicolumn{6}{|c|}{Offset [11:0]} &   \multicolumn{2}{|c|}{Func: 11xxxx}      &   \multicolumn{2}{|c|}{Type: 010} &   Long \\
+    
+    %\hline         &   \multicolumn{13}{l}{31} &   1               &   0 \\
+    \hline I0D  &   \multicolumn{14}{|c|}{Imm/Offset [42:12]}   &   Long \\
+    
+    %\hline         &   \multicolumn{13}{l}{31} &   1               &   0 \\
+    \hline I0T  &   \multicolumn{14}{|c|}{Imm/Offset [73:43]}   &   Long: 0 \\
+    
+    \hline          \multicolumn{16}{c}{} \\
+    
+    
+    \hline      &   \multicolumn{1}{l}{31}  &   27      &   \multicolumn{1}{l}{26}  &   22  &   \multicolumn{1}{l}{21}  &   17      &   \multicolumn{3}{l}{16}  &   10      &   \multicolumn{1}{l}{9}   &   4   &   \multicolumn{1}{l}{3}   &   1   &   0 \\
+    \hline R3A  &   \multicolumn{2}{|c|}{Dest}          &   \multicolumn{2}{|c|}{Src 1}     &   \multicolumn{2}{|c|}{Src 2}         &   \multicolumn{4}{|c|}{Imm [6:0]}     &   \multicolumn{2}{|c|}{Func}      &   \multicolumn{2}{|c|}{Type: 011} &   Long \\
+    
+    %\hline         &   \multicolumn{1}{l}{31}  &   27      &   \multicolumn{1}{l}{26}  &   22  &   \multicolumn{1}{l}{21}  &   17      &   \multicolumn{3}{l}{16}  &   10          &   \multicolumn{1}{l}{9}   &   4       &   \multicolumn{1}{l}{3}   &   1   &   0 \\
+    \hline R3B  &   \multicolumn{2}{|c|}{Dest High/1}   &   \multicolumn{2}{|c|}{Src/Base}  &   \multicolumn{2}{|c|}{Dest Low/2}    &   \multicolumn{4}{|c|}{Imm/Offset [6:0]}  &   \multicolumn{2}{|c|}{Func: 11xxxx}  &   \multicolumn{2}{|c|}{Type: 011} &   Long \\
+    
+    %\hline         &   \multicolumn{1}{l}{31}  &   27      &   \multicolumn{1}{l}{26}  &   22  &   \multicolumn{1}{l}{21}  &   17      &   \multicolumn{3}{l}{16}  &   10      &   \multicolumn{1}{l}{9}   &   4       &   \multicolumn{1}{l}{3}   &   1   &   0 \\
+    \hline R3C  &   \multicolumn{2}{|c|}{Base}          &   \multicolumn{2}{|c|}{Src 1}     &   \multicolumn{2}{|c|}{Src 2}         &   \multicolumn{4}{|c|}{Offset [6:0]}  &   \multicolumn{2}{|c|}{Func: 1111xx}  &   \multicolumn{2}{|c|}{Type: 011} &   Long \\
+    
+    %\hline         &   \multicolumn{13}{l}{31} &   1               &   0 \\
+    \hline I3D  &   \multicolumn{14}{|c|}{Imm/Offset [37:7]}    &   Long \\
+    
+    %\hline         &   \multicolumn{13}{l}{31} &   1               &   0 \\
+    \hline I3T  &   \multicolumn{14}{|c|}{Imm/Offset [68:38]}   &   Long: 0 \\
+    
+    \hline          \multicolumn{16}{c}{} \\
+    
+    
+    \hline      &   \multicolumn{1}{l}{31}  &   27      &   \multicolumn{1}{l}{26}  &   22  &   \multicolumn{1}{l}{21}  &   17      &   \multicolumn{1}{l}{16}  &   12      &   \multicolumn{1}{l}{11}  &   10  &   \multicolumn{1}{l}{9}   &   4   &   \multicolumn{1}{l}{3}   &   1   &   0 \\
+    \hline R4A  &   \multicolumn{2}{|c|}{Dest High/1}   &   \multicolumn{2}{|c|}{Src 1}     &   \multicolumn{2}{|c|}{Src 2}         &   \multicolumn{2}{|c|}{Dest Low/2}    &   \multicolumn{2}{|c|}{Imm [1:0]} &   \multicolumn{2}{|c|}{Func}      &   \multicolumn{2}{|c|}{Type: 100} &   Long \\
+
+    %\hline         &   \multicolumn{1}{l}{31}  &   27      &   \multicolumn{1}{l}{26}  &   22  &   \multicolumn{1}{l}{21}  &   17      &   \multicolumn{1}{l}{16}  &   12      &   \multicolumn{1}{l}{11}  &   10  &   \multicolumn{1}{l}{9}   &   4   &   \multicolumn{1}{l}{3}   &   1   &   0 \\
+    \hline R4B  &   \multicolumn{2}{|c|}{Dest}  &   \multicolumn{2}{|c|}{Src 1}     &   \multicolumn{2}{|c|}{Src 2}         &   \multicolumn{2}{|c|}{Src 3/Cond}    &   \multicolumn{2}{|c|}{Imm [1:0]} &   \multicolumn{2}{|c|}{Func}      &   \multicolumn{2}{|c|}{Type: 100} &   Long \\
+
+    %\hline         &   \multicolumn{13}{l}{31} &   1       &   0 \\
+    \hline I4D  &   \multicolumn{14}{|c|}{Imm [32:2]}   &   Long \\
+    
+    %\hline         &   \multicolumn{13}{l}{31} &   1       &   0 \\
+    \hline I4T  &   \multicolumn{14}{|c|}{Imm [63:33]}  &   Long: 0 \\
+    
+    
+    \hline
+    \end{tabular}
+    \end{table}
+    
+    \newpage
+
+\section{Base Integer Instructions}
+
+    \subsection{R0 Instructions}
+    
+    \begin{center}
+    \begin{longtable}{|c|l|r|l|r|l|r|c|c|}
+    \caption{List of R0 Instructions}
+    \label{table:r0_instr} \\
+    
+                    \multicolumn{9}{c}{R0: No Source Register, No Destination Register, Immediate/Offset} \\
+    \hline      &   \multicolumn{1}{l}{31}  &   10          &   \multicolumn{1}{l}{9}   &   4   &   \multicolumn{1}{l}{3}   &   1   &   0   & \\
+    \hline R0   &   \multicolumn{2}{|c|}{Imm/Offset [21:0]} &   \multicolumn{2}{|c|}{Func}      &   \multicolumn{2}{|c|}{Type}  &   Long    &   Description \\
+    
+    
+    \hline          \multicolumn{9}{|c|}{} \\
+    
+                    \multicolumn{9}{|c|}{No-op} \\
+    \hline nop  &   \multicolumn{2}{|c|}{0}     &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{000}   &   0   &   No-op \\
+    
+    
+    \hline          \multicolumn{9}{|c|}{} \\
+    
+                    \multicolumn{9}{|c|}{Unconditional Branch} \\
+    \hline jmp  &   \multicolumn{2}{|c|}{offset [21:0]}     &   \multicolumn{2}{|c|}{000001}    &   \multicolumn{2}{|c|}{000}   &   long    &   Jump \\
+    \hline call &   \multicolumn{2}{|c|}{offset [21:0]}     &   \multicolumn{2}{|c|}{000010}    &   \multicolumn{2}{|c|}{000}   &   long    &   Jump and link \\
+    
+    
+    \hline              \multicolumn{9}{|c|}{} \\
+    
+                        \multicolumn{9}{|c|}{Memory} \\
+    \hline tstart   &   \multicolumn{2}{|c|}{0}     &   \multicolumn{2}{|c|}{000011}    &   \multicolumn{2}{|c|}{000}   &   0   &   Transaction start \\
+    \hline tend     &   \multicolumn{2}{|c|}{0}     &   \multicolumn{2}{|c|}{000100}    &   \multicolumn{2}{|c|}{000}   &   0   &   Transaction end \\
+    \hline mfence   &   \multicolumn{2}{|c|}{0}     &   \multicolumn{2}{|c|}{000101}    &   \multicolumn{2}{|c|}{000}   &   0   &   Memory fence (read/write) \\
+    \hline rfence   &   \multicolumn{2}{|c|}{0}     &   \multicolumn{2}{|c|}{000110}    &   \multicolumn{2}{|c|}{000}   &   0   &   Read fence \\
+    \hline wfence   &   \multicolumn{2}{|c|}{0}     &   \multicolumn{2}{|c|}{000111}    &   \multicolumn{2}{|c|}{000}   &   0   &   Write fence \\
+
+
+    \hline              \multicolumn{9}{|c|}{} \\
+    
+                        \multicolumn{9}{|c|}{Cache and TLB Manipulation} \\
+    \hline fitlb    &   \multicolumn{2}{|c|}{0}     &   \multicolumn{2}{|c|}{001000}    &   \multicolumn{2}{|c|}{000}   &   0   &   Flush instruction TLB \\
+    \hline fdtlb    &   \multicolumn{2}{|c|}{0}     &   \multicolumn{2}{|c|}{001001}    &   \multicolumn{2}{|c|}{000}   &   0   &   Flush data TLB \\
+    \hline ficache  &   \multicolumn{2}{|c|}{0}     &   \multicolumn{2}{|c|}{001010}    &   \multicolumn{2}{|c|}{000}   &   0   &   Flush instruction cache \\
+    \hline fdcache  &   \multicolumn{2}{|c|}{0}     &   \multicolumn{2}{|c|}{001011}    &   \multicolumn{2}{|c|}{000}   &   0   &   Flush data cache \\
+    
+    
+    \hline              \multicolumn{9}{|c|}{} \\
+    
+                        \multicolumn{9}{|c|}{System} \\
+    \hline syscall  &   \multicolumn{2}{|c|}{0}     &   \multicolumn{2}{|c|}{001100}    &   \multicolumn{2}{|c|}{000}   &   0   &   Enter supervisor mode \\
+    \hline switch   &   \multicolumn{2}{|c|}{0}     &   \multicolumn{2}{|c|}{001101}    &   \multicolumn{2}{|c|}{000}   &   0   &   Switch and/or address space \\
+    \hline halt     &   \multicolumn{2}{|c|}{0}     &   \multicolumn{2}{|c|}{001110}    &   \multicolumn{2}{|c|}{000}   &   0   &   Halt current core until next interrupt \\
+    \hline shutdown &   \multicolumn{2}{|c|}{0}     &   \multicolumn{2}{|c|}{001111}    &   \multicolumn{2}{|c|}{000}   &   0   &   Shut down current core until next start request \\
+    \hline reset    &   \multicolumn{2}{|c|}{0}     &   \multicolumn{2}{|c|}{010000}    &   \multicolumn{2}{|c|}{000}   &   0   &   Reset the whole processor \\
+    
+    
+    \hline
+    \end{longtable}
+    \end{center}
+    
+    
+    \subsection{R1 Instructions}
+    
+    \begin{center}
+    \begin{longtable}{|c|l|r|l|r|l|r|l|r|c|c|}
+    \caption{List of R1 Instructions}
+    \label{table:r1_instr} \\
+
+    %
+    % R1-A
+    %   
+                    \multicolumn{11}{c}{R1-A: One Source Registers, No Destination Register, Offset} \\ 
+    \hline      &   \multicolumn{1}{l}{31}  &   27      &   \multicolumn{1}{l}{26}  &   10          &   \multicolumn{1}{l}{9}   &   4   &   \multicolumn{1}{l}{3}   &   1   &   0       & \\
+    \hline R1A  &   \multicolumn{2}{|c|}{Src/Base}      &   \multicolumn{2}{|c|}{Imm/Offset [16:0]} &   \multicolumn{2}{|c|}{Func}      &   \multicolumn{2}{|c|}{Type: 001} &   Long    &   Description \\
+    
+    
+    \hline          \multicolumn{11}{|c|}{} \\
+    
+                    \multicolumn{11}{|c|}{Conditional Branch} \\
+    \hline jeqz &   \multicolumn{2}{|c|}{src}   &   \multicolumn{2}{|c|}{offset [16:0]} &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{001}   &   long    & Jump if equal to zero \\
+    \hline jnez &   \multicolumn{2}{|c|}{src}   &   \multicolumn{2}{|c|}{offset [16:0]} &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{001}   &   long    & Jump if not equal to zero \\
+    \hline jgtz &   \multicolumn{2}{|c|}{src}   &   \multicolumn{2}{|c|}{offset [16:0]} &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{001}   &   long    & Jump if greater than zero \\
+    \hline jgez &   \multicolumn{2}{|c|}{src}   &   \multicolumn{2}{|c|}{offset [16:0]} &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{001}   &   long    & Jump if greater or equal to zero \\
+    \hline jltz &   \multicolumn{2}{|c|}{src}   &   \multicolumn{2}{|c|}{offset [16:0]} &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{001}   &   long    & Jump if less than zero \\
+    \hline jlez &   \multicolumn{2}{|c|}{src}   &   \multicolumn{2}{|c|}{offset [16:0]} &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{001}   &   long    & Jump if less or equal to zero \\
+    
+    
+    \hline          \multicolumn{11}{|c|}{} \\
+    
+                    \multicolumn{11}{|c|}{Unconditional Branch} \\
+    \hline jmpr &   \multicolumn{2}{|c|}{base}  &   \multicolumn{2}{|c|}{offset [16:0]} &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{001}   &   long    & Jump to offset(base) \\
+    \hline callr &  \multicolumn{2}{|c|}{base}  &   \multicolumn{2}{|c|}{offset [16:0]} &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{001}   &   long    & Call offset(base) \\
+    
+        
+    \hline          \multicolumn{11}{|c|}{} \\
+    
+                    \multicolumn{11}{|c|}{TLB Manipulation} \\
+    \hline iitlb &  \multicolumn{2}{|c|}{base}  &   \multicolumn{2}{|c|}{offset [16:0]} &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{001}   &   long    & \\
+    \hline idtlb &  \multicolumn{2}{|c|}{base}  &   \multicolumn{2}{|c|}{offset [16:0]} &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{001}   &   long    & \\
+
+    \hline          \multicolumn{11}{c}{} \\
+    
+    
+    %
+    % R1-B
+    %   
+                    \multicolumn{11}{c}{R1-B: No Source Registers, One Destination Register, Immediate} \\  
+    \hline      &   \multicolumn{1}{l}{31}  &   27      &   \multicolumn{1}{l}{26}  &   10      &   \multicolumn{1}{l}{9}   &   4   &   \multicolumn{1}{l}{3}   &   1   &   0       & \\
+    \hline R1B  &   \multicolumn{2}{|c|}{Dest}          &   \multicolumn{2}{|c|}{Imm [16:0]}    &   \multicolumn{2}{|c|}{Func}      &   \multicolumn{2}{|c|}{Type: 001} &   Long    &   Description \\
+    
+    
+    \hline          \multicolumn{11}{|c|}{} \\
+    
+                    \multicolumn{11}{|c|}{Load Immediate} \\
+    \hline li   &   \multicolumn{2}{|c|}{rd}    &   \multicolumn{2}{|c|}{imm [16:0]}    &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{001}   &   long    & \\
+    \hline liu  &   \multicolumn{2}{|c|}{rd}    &   \multicolumn{2}{|c|}{imm [16:0]}    &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{001}   &   long    & \\
+    \hline lihz &   \multicolumn{2}{|c|}{rd}    &   \multicolumn{2}{|c|}{imm [16:0]}    &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{001}   &   long    & \\
+    \hline lilz &   \multicolumn{2}{|c|}{rd}    &   \multicolumn{2}{|c|}{imm [16:0]}    &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{001}   &   long    & \\
+    \hline liq1z &  \multicolumn{2}{|c|}{rd}    &   \multicolumn{2}{|c|}{imm [16:0]}    &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{001}   &   long    & \\
+    \hline liq2z &  \multicolumn{2}{|c|}{rd}    &   \multicolumn{2}{|c|}{imm [16:0]}    &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{001}   &   long    & \\
+    \hline liq3z &  \multicolumn{2}{|c|}{rd}    &   \multicolumn{2}{|c|}{imm [16:0]}    &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{001}   &   long    & \\
+    \hline liq4z &  \multicolumn{2}{|c|}{rd}    &   \multicolumn{2}{|c|}{imm [16:0]}    &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{001}   &   long    & \\
+    
+    \hline          \multicolumn{11}{c}{} \\
+    
+    
+    %
+    % R1-C
+    %   
+                    \multicolumn{11}{c}{R1-C: Shared Source/Destination Register, Immediate} \\ 
+    \hline      &   \multicolumn{1}{l}{31}  &   27      &   \multicolumn{1}{l}{26}  &   10      &   \multicolumn{1}{l}{9}   &   4   &   \multicolumn{1}{l}{3}   &   1   &   0       & \\
+    \hline R1C  &   \multicolumn{2}{|c|}{Dest/Src}      &   \multicolumn{2}{|c|}{Imm [16:0]}    &   \multicolumn{2}{|c|}{Func}      &   \multicolumn{2}{|c|}{Type: 001} &   Long    &   Description \\
+    
+    
+    \hline          \multicolumn{11}{|c|}{} \\
+    
+                    \multicolumn{11}{|c|}{Load Immediate} \\
+    \hline lih  &   \multicolumn{2}{|c|}{rd/rs} &   \multicolumn{2}{|c|}{imm [16:0]}    &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{001}   &   long    & \\
+    \hline lil  &   \multicolumn{2}{|c|}{rd/rs} &   \multicolumn{2}{|c|}{imm [16:0]}    &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{001}   &   long    & \\
+    \hline liq1 &   \multicolumn{2}{|c|}{rd/rs} &   \multicolumn{2}{|c|}{imm [16:0]}    &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{001}   &   long    & \\
+    \hline liq2 &   \multicolumn{2}{|c|}{rd/rs} &   \multicolumn{2}{|c|}{imm [16:0]}    &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{001}   &   long    & \\
+    \hline liq3 &   \multicolumn{2}{|c|}{rd/rs} &   \multicolumn{2}{|c|}{imm [16:0]}    &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{001}   &   long    & \\
+    \hline liq4 &   \multicolumn{2}{|c|}{rd/rs} &   \multicolumn{2}{|c|}{imm [16:0]}    &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{001}   &   long    & \\
+    
+    
+    \hline
+    \end{longtable}
+    \end{center}
+        
+    
+    \subsection{R2 Instructions}
+    
+    \begin{center}
+    \begin{longtable}{|c|l|r|l|r|l|r|l|r|l|r|c|c|}
+    \caption{List of R2 Instructions}
+    \label{table:r2_instr} \\
+    
+    %
+    % R2-A
+    %   
+                    \multicolumn{13}{c}{R2-A: One Source Registers, One Destination Register, Immediate/Offset} \\  
+    \hline      &   \multicolumn{1}{l}{31}  &   27  &   \multicolumn{1}{l}{26}  &   22  &   \multicolumn{1}{l}{21}  &   10          &   \multicolumn{1}{l}{9}   &   4   &   \multicolumn{1}{l}{3}   &   1   &   0   & \\
+    \hline R2A  &   \multicolumn{2}{|c|}{Dest}      &   \multicolumn{2}{|c|}{Src/Base}  &   \multicolumn{2}{|c|}{Imm/Offset [11:0]} &   \multicolumn{2}{|c|}{Func}      &   \multicolumn{2}{|c|}{Type}  &   Long    &   Description \\
+    
+
+    \hline              \multicolumn{13}{|c|}{} \\
+    
+                        \multicolumn{13}{|c|}{Arithmetic} \\
+    \hline addi     &   \multicolumn{2}{|c|}{rd}    &   \multicolumn{2}{|c|}{rs}    &   \multicolumn{2}{|c|}{imm [11:0]}    &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{010}   &   Long    &   Add immediate \\
+    \hline addui    &   \multicolumn{2}{|c|}{rd}    &   \multicolumn{2}{|c|}{rs}    &   \multicolumn{2}{|c|}{imm [11:0]}    &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{010}   &   Long    &   Add immediate, unsigned \\
+    \hline subi     &   \multicolumn{2}{|c|}{rd}    &   \multicolumn{2}{|c|}{rs}    &   \multicolumn{2}{|c|}{imm [11:0]}    &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{010}   &   Long    &   Sub immediate \\
+    \hline subui    &   \multicolumn{2}{|c|}{rd}    &   \multicolumn{2}{|c|}{rs}    &   \multicolumn{2}{|c|}{imm [11:0]}    &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{010}   &   Long    &   Sub immediate, unsigned \\
+    \hline subri    &   \multicolumn{2}{|c|}{rd}    &   \multicolumn{2}{|c|}{rs}    &   \multicolumn{2}{|c|}{imm [11:0]}    &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{010}   &   Long    &   Subtracted by immediate \\
+    \hline subrui   &   \multicolumn{2}{|c|}{rd}    &   \multicolumn{2}{|c|}{rs}    &   \multicolumn{2}{|c|}{imm [11:0]}    &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{010}   &   Long    &   Subtracted by immediate, unsigned \\
+    
+    
+    \hline              \multicolumn{13}{|c|}{} \\
+    
+                        \multicolumn{13}{|c|}{Logical} \\
+    \hline andi     &   \multicolumn{2}{|c|}{rd}    &   \multicolumn{2}{|c|}{rs}    &   \multicolumn{2}{|c|}{imm [11:0]}    &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{010}   &   Long    &   And immediate \\
+    \hline ori      &   \multicolumn{2}{|c|}{rd}    &   \multicolumn{2}{|c|}{rs}    &   \multicolumn{2}{|c|}{imm [11:0]}    &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{010}   &   Long    &   Or immediate \\
+    \hline nori     &   \multicolumn{2}{|c|}{rd}    &   \multicolumn{2}{|c|}{rs}    &   \multicolumn{2}{|c|}{imm [11:0]}    &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{010}   &   Long    &   Nor immediate \\
+    \hline xori     &   \multicolumn{2}{|c|}{rd}    &   \multicolumn{2}{|c|}{rs}    &   \multicolumn{2}{|c|}{imm [11:0]}    &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{010}   &   Long    &   Xor immediate \\
+    
+    
+    \hline              \multicolumn{13}{|c|}{} \\
+    
+                        \multicolumn{13}{|c|}{Shift} \\
+    \hline slli     &   \multicolumn{2}{|c|}{rd}    &   \multicolumn{2}{|c|}{rs}    &   \multicolumn{2}{|c|}{imm [11:0]}    &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{010}   &   0   &   Add \\
+    \hline srli     &   \multicolumn{2}{|c|}{rd}    &   \multicolumn{2}{|c|}{rs}    &   \multicolumn{2}{|c|}{imm [11:0]}    &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{010}   &   0   &   Shift rs left imm bits \\
+    \hline srai     &   \multicolumn{2}{|c|}{rd}    &   \multicolumn{2}{|c|}{rs}    &   \multicolumn{2}{|c|}{imm [11:0]}    &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{010}   &   0   &   Shift rs right imm bits \\
+    \hline roli     &   \multicolumn{2}{|c|}{rd}    &   \multicolumn{2}{|c|}{rs}    &   \multicolumn{2}{|c|}{imm [11:0]}    &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{010}   &   0   &   Rotate rs left imm bits \\
+    \hline rori     &   \multicolumn{2}{|c|}{rd}    &   \multicolumn{2}{|c|}{rs}    &   \multicolumn{2}{|c|}{imm [11:0]}    &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{010}   &   0   & Rotate rs right imm bits \\
+    
+    
+    \hline              \multicolumn{13}{|c|}{} \\
+    
+                        \multicolumn{13}{|c|}{General and Special Purpose Registers Transportation} \\
+    \hline rgts     &   \multicolumn{2}{|c|}{rd}    &   \multicolumn{2}{|c|}{rs}    &   \multicolumn{2}{|c|}{imm [11:0]}    &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{010}   &   Long    &   Move general to special \\
+    \hline rstg     &   \multicolumn{2}{|c|}{rd}    &   \multicolumn{2}{|c|}{rs}    &   \multicolumn{2}{|c|}{imm [11:0]}    &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{010}   &   Long    &   Move special to general \\
+    
+    
+    \hline              \multicolumn{13}{|c|}{} \\
+    
+                        \multicolumn{13}{|c|}{Load} \\
+    \hline ld32     &   \multicolumn{2}{|c|}{rd}    &   \multicolumn{2}{|c|}{base}  &   \multicolumn{2}{|c|}{offset [11:0]} &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{010}   &   Long    &   Add \\
+    \hline ld16     &   \multicolumn{2}{|c|}{rd}    &   \multicolumn{2}{|c|}{base}  &   \multicolumn{2}{|c|}{offset [11:0]} &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{010}   &   Long    &   Add \\
+    \hline ld16u    &   \multicolumn{2}{|c|}{rd}    &   \multicolumn{2}{|c|}{base}  &   \multicolumn{2}{|c|}{offset [11:0]} &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{010}   &   Long    &   Add \\
+    \hline ld8      &   \multicolumn{2}{|c|}{rd}    &   \multicolumn{2}{|c|}{base}  &   \multicolumn{2}{|c|}{offset [11:0]} &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{010}   &   Long    &   Add \\
+    \hline ld8u     &   \multicolumn{2}{|c|}{rd}    &   \multicolumn{2}{|c|}{base}  &   \multicolumn{2}{|c|}{offset [11:0]} &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{010}   &   Long    &   Add \\
+    \hline ll       &   \multicolumn{2}{|c|}{rd}    &   \multicolumn{2}{|c|}{base}  &   \multicolumn{2}{|c|}{offset [11:0]} &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{010}   &   Long    &   Add \\
+    \hline tld      &   \multicolumn{2}{|c|}{rd}    &   \multicolumn{2}{|c|}{base}  &   \multicolumn{2}{|c|}{offset [11:0]} &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{010}   &   Long    &   Add \\
+    \hline ldl      &   \multicolumn{2}{|c|}{rd}    &   \multicolumn{2}{|c|}{base}  &   \multicolumn{2}{|c|}{offset [11:0]} &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{010}   &   Long    &   Add \\
+    \hline ldr      &   \multicolumn{2}{|c|}{rd}    &   \multicolumn{2}{|c|}{base}  &   \multicolumn{2}{|c|}{offset [11:0]} &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{010}   &   Long    &   Add \\
+    
+    \hline          \multicolumn{13}{c}{} \\
+    
+    
+    %
+    % R2-B
+    %   
+                    \multicolumn{13}{c}{R2-B: Two Source Registers, No Destination Register, Offset} \\ 
+    \hline      &   \multicolumn{1}{l}{31}  &   27      &   \multicolumn{1}{l}{26}  &   22  &   \multicolumn{1}{l}{21}  &   10      &   \multicolumn{1}{l}{9}   &   4           &   \multicolumn{1}{l}{3}   &   1   &   0       & \\
+    \hline R2B  &   \multicolumn{2}{|c|}{Base/Src}      &   \multicolumn{2}{|c|}{Src}       &   \multicolumn{2}{|c|}{Offset [11:0]} &   \multicolumn{2}{|c|}{Func: 11xxxx}      &   \multicolumn{2}{|c|}{Type}      &   Long    &   Description \\
+    
+
+    \hline              \multicolumn{13}{|c|}{} \\
+    
+                        \multicolumn{13}{|c|}{Store} \\
+    \hline st32     &   \multicolumn{2}{|c|}{base}  &   \multicolumn{2}{|c|}{rs}    &   \multicolumn{2}{|c|}{offset [11:0]} &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{010}   &   Long    &   Add \\
+    \hline st16     &   \multicolumn{2}{|c|}{base}  &   \multicolumn{2}{|c|}{rs}    &   \multicolumn{2}{|c|}{offset [11:0]} &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{010}   &   Long    &   Add \\
+    \hline st16u    &   \multicolumn{2}{|c|}{base}  &   \multicolumn{2}{|c|}{rs}    &   \multicolumn{2}{|c|}{offset [11:0]} &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{010}   &   Long    &   Add \\
+    \hline st8      &   \multicolumn{2}{|c|}{base}  &   \multicolumn{2}{|c|}{rs}    &   \multicolumn{2}{|c|}{offset [11:0]} &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{010}   &   Long    &   Add \\
+    \hline stu8     &   \multicolumn{2}{|c|}{base}  &   \multicolumn{2}{|c|}{rs}    &   \multicolumn{2}{|c|}{offset [11:0]} &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{010}   &   Long    &   Add \\
+    \hline sc       &   \multicolumn{2}{|c|}{base}  &   \multicolumn{2}{|c|}{rs}    &   \multicolumn{2}{|c|}{offset [11:0]} &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{010}   &   Long    &   Add \\  
+    \hline tst      &   \multicolumn{2}{|c|}{base}  &   \multicolumn{2}{|c|}{rs}    &   \multicolumn{2}{|c|}{offset [11:0]} &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{010}   &   Long    &   Add \\
+    \hline stl      &   \multicolumn{2}{|c|}{base}  &   \multicolumn{2}{|c|}{rs}    &   \multicolumn{2}{|c|}{offset [11:0]} &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{010}   &   Long    &   Add \\
+    \hline str      &   \multicolumn{2}{|c|}{base}  &   \multicolumn{2}{|c|}{rs}    &   \multicolumn{2}{|c|}{offset [11:0]} &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{010}   &   Long    &   Add \\
+    
+    
+    \hline              \multicolumn{13}{|c|}{} \\
+    
+                        \multicolumn{13}{|c|}{Conditional Branch} \\
+    \hline jeqzr    &   \multicolumn{2}{|c|}{base}  &   \multicolumn{2}{|c|}{rs}    &   \multicolumn{2}{|c|}{offset [11:0]} &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{010}   &   Long    &   Add \\
+    \hline jnezr    &   \multicolumn{2}{|c|}{base}  &   \multicolumn{2}{|c|}{rs}    &   \multicolumn{2}{|c|}{offset [11:0]} &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{010}   &   Long    &   Add \\
+    \hline jgtzr    &   \multicolumn{2}{|c|}{base}  &   \multicolumn{2}{|c|}{rs}    &   \multicolumn{2}{|c|}{offset [11:0]} &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{010}   &   Long    &   Add \\
+    \hline jgezr    &   \multicolumn{2}{|c|}{base}  &   \multicolumn{2}{|c|}{rs}    &   \multicolumn{2}{|c|}{offset [11:0]} &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{010}   &   Long    &   Add \\
+    \hline jltzr    &   \multicolumn{2}{|c|}{base}  &   \multicolumn{2}{|c|}{rs}    &   \multicolumn{2}{|c|}{offset [11:0]} &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{010}   &   Long    &   Add \\
+    \hline jlezr    &   \multicolumn{2}{|c|}{base}  &   \multicolumn{2}{|c|}{rs}    &   \multicolumn{2}{|c|}{offset [11:0]} &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{010}   &   Long    &   Add \\
+    
+    
+    \hline              \multicolumn{13}{|c|}{} \\
+    
+                        \multicolumn{13}{|c|}{Conditional Branch} \\
+    \hline jeq      &   \multicolumn{2}{|c|}{rs2}   &   \multicolumn{2}{|c|}{rs1}   &   \multicolumn{2}{|c|}{offset [11:0]} &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{010}   &   Long    &   Add \\
+    \hline jne      &   \multicolumn{2}{|c|}{rs2}   &   \multicolumn{2}{|c|}{rs1}   &   \multicolumn{2}{|c|}{offset [11:0]} &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{010}   &   Long    &   Add \\
+    \hline jgt      &   \multicolumn{2}{|c|}{rs2}   &   \multicolumn{2}{|c|}{rs1}   &   \multicolumn{2}{|c|}{offset [11:0]} &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{010}   &   Long    &   Add \\
+    \hline jge      &   \multicolumn{2}{|c|}{rs2}   &   \multicolumn{2}{|c|}{rs1}   &   \multicolumn{2}{|c|}{offset [11:0]} &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{010}   &   Long    &   Add \\
+    \hline jlt      &   \multicolumn{2}{|c|}{rs2}   &   \multicolumn{2}{|c|}{rs1}   &   \multicolumn{2}{|c|}{offset [11:0]} &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{010}   &   Long    &   Add \\
+    \hline jle      &   \multicolumn{2}{|c|}{rs2}   &   \multicolumn{2}{|c|}{rs1}   &   \multicolumn{2}{|c|}{offset [11:0]} &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{010}   &   Long    &   Add \\
+    
+            
+    \hline
+    \end{longtable}
+    \end{center}
+    
+    
+    \subsection{R3 Instructions}
+    
+    \begin{center}
+    \begin{longtable}{|c|l|r|l|r|l|r|l|r|l|r|l|r|c|c|}
+    \caption{List of R3 Instructions}
+    \label{table:r3_instr} \\
+    
+    %
+    % R3-A
+    %   
+                    \multicolumn{15}{c}{R3-A: Two Source Registers, One Destination Register, No Immediate} \\  
+    \hline      &   \multicolumn{1}{l}{31}  &   27      &   \multicolumn{1}{l}{26}  &   22  &   \multicolumn{1}{l}{21}  &   17      &   \multicolumn{1}{l}{16}  &   10      &   \multicolumn{1}{l}{9}   &   4   &   \multicolumn{1}{l}{3}   &   1   &   0       & \\
+    \hline R3A  &   \multicolumn{2}{|c|}{Dest}          &   \multicolumn{2}{|c|}{Src 1}     &   \multicolumn{2}{|c|}{Src 2}         &   \multicolumn{2}{|c|}{Imm [6:0]}     &   \multicolumn{2}{|c|}{Func}      &   \multicolumn{2}{|c|}{Type}      &   Long    &   Description \\
+    
+    
+    \hline          \multicolumn{15}{|c|}{} \\
+    
+                    \multicolumn{15}{|c|}{Arithmetic} \\    
+    \hline add  &   \multicolumn{2}{|c|}{rd}            &   \multicolumn{2}{|c|}{rs1}       &   \multicolumn{2}{|c|}{rs2}           &   \multicolumn{2}{|c|}{0}             &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{011}       &   0       &   Add signed \\
+    \hline addu &   \multicolumn{2}{|c|}{rd}            &   \multicolumn{2}{|c|}{rs1}       &   \multicolumn{2}{|c|}{rs2}           &   \multicolumn{2}{|c|}{0}             &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{011}       &   0       &   Add signed \\
+    \hline sub  &   \multicolumn{2}{|c|}{rd}            &   \multicolumn{2}{|c|}{rs1}       &   \multicolumn{2}{|c|}{rs2}           &   \multicolumn{2}{|c|}{0}             &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{011}       &   0       &   Add signed \\
+    \hline subu &   \multicolumn{2}{|c|}{rd}            &   \multicolumn{2}{|c|}{rs1}       &   \multicolumn{2}{|c|}{rs2}           &   \multicolumn{2}{|c|}{0}             &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{011}       &   0       &   Add signed \\
+
+
+    \hline          \multicolumn{15}{|c|}{} \\
+    
+                    \multicolumn{15}{|c|}{Logical} \\   
+    \hline and  &   \multicolumn{2}{|c|}{rd}            &   \multicolumn{2}{|c|}{rs1}       &   \multicolumn{2}{|c|}{rs2}           &   \multicolumn{2}{|c|}{0}             &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{011}       &   0       &   Add signed \\
+    \hline or   &   \multicolumn{2}{|c|}{rd}            &   \multicolumn{2}{|c|}{rs1}       &   \multicolumn{2}{|c|}{rs2}           &   \multicolumn{2}{|c|}{0}             &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{011}       &   0       &   Add signed \\
+    \hline nor  &   \multicolumn{2}{|c|}{rd}            &   \multicolumn{2}{|c|}{rs1}       &   \multicolumn{2}{|c|}{rs2}           &   \multicolumn{2}{|c|}{0}             &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{011}       &   0       &   Add signed \\
+    \hline xor  &   \multicolumn{2}{|c|}{rd}            &   \multicolumn{2}{|c|}{rs1}       &   \multicolumn{2}{|c|}{rs2}           &   \multicolumn{2}{|c|}{0}             &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{011}       &   0       &   Add signed \\
+
+
+    \hline          \multicolumn{15}{|c|}{} \\
+    
+                    \multicolumn{15}{|c|}{Shift} \\ 
+    \hline sll  &   \multicolumn{2}{|c|}{rd}            &   \multicolumn{2}{|c|}{rs1}       &   \multicolumn{2}{|c|}{rs2}           &   \multicolumn{2}{|c|}{0}             &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{011}       &   0       &   Add signed \\
+    \hline slr  &   \multicolumn{2}{|c|}{rd}            &   \multicolumn{2}{|c|}{rs1}       &   \multicolumn{2}{|c|}{rs2}           &   \multicolumn{2}{|c|}{0}             &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{011}       &   0       &   Add signed \\
+    \hline sra  &   \multicolumn{2}{|c|}{rd}            &   \multicolumn{2}{|c|}{rs1}       &   \multicolumn{2}{|c|}{rs2}           &   \multicolumn{2}{|c|}{0}             &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{011}       &   0       &   Add signed \\
+    \hline rol  &   \multicolumn{2}{|c|}{rd}            &   \multicolumn{2}{|c|}{rs1}       &   \multicolumn{2}{|c|}{rs2}           &   \multicolumn{2}{|c|}{0}             &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{011}       &   0       &   Add signed \\
+    \hline ror  &   \multicolumn{2}{|c|}{rd}            &   \multicolumn{2}{|c|}{rs1}       &   \multicolumn{2}{|c|}{rs2}           &   \multicolumn{2}{|c|}{0}             &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{011}       &   0       &   Add signed \\
+
+
+    \hline          \multicolumn{15}{|c|}{} \\
+    
+                    \multicolumn{15}{|c|}{Conditional Set} \\   
+    \hline seq  &   \multicolumn{2}{|c|}{rd}            &   \multicolumn{2}{|c|}{rs1}       &   \multicolumn{2}{|c|}{rs2}           &   \multicolumn{2}{|c|}{0}             &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{011}       &   0       &   Add signed \\
+    \hline sne  &   \multicolumn{2}{|c|}{rd}            &   \multicolumn{2}{|c|}{rs1}       &   \multicolumn{2}{|c|}{rs2}           &   \multicolumn{2}{|c|}{0}             &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{011}       &   0       &   Add signed \\
+    \hline sgt  &   \multicolumn{2}{|c|}{rd}            &   \multicolumn{2}{|c|}{rs1}       &   \multicolumn{2}{|c|}{rs2}           &   \multicolumn{2}{|c|}{0}             &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{011}       &   0       &   Add signed \\
+    \hline sge  &   \multicolumn{2}{|c|}{rd}            &   \multicolumn{2}{|c|}{rs1}       &   \multicolumn{2}{|c|}{rs2}           &   \multicolumn{2}{|c|}{0}             &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{011}       &   0       &   Add signed \\
+    \hline slt  &   \multicolumn{2}{|c|}{rd}            &   \multicolumn{2}{|c|}{rs1}       &   \multicolumn{2}{|c|}{rs2}           &   \multicolumn{2}{|c|}{0}             &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{011}       &   0       &   Add signed \\
+    \hline sle  &   \multicolumn{2}{|c|}{rd}            &   \multicolumn{2}{|c|}{rs1}       &   \multicolumn{2}{|c|}{rs2}           &   \multicolumn{2}{|c|}{0}             &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{011}       &   0       &   Add signed \\
+
+    \hline          \multicolumn{15}{c}{} \\
+
+    
+    %
+    % R3-B
+    %
+                    \multicolumn{15}{c}{} \\
+    
+                    \multicolumn{15}{c}{R3-B: One Source Registers, Two Destination Register, Immediate/Offset} \\  
+    \hline      &   \multicolumn{1}{l}{31}  &   27      &   \multicolumn{1}{l}{26}  &   22  &   \multicolumn{1}{l}{21}  &   17      &   \multicolumn{1}{l}{16}  &   10          &   \multicolumn{1}{l}{9}   &   4       &   \multicolumn{1}{l}{3}   &   1   &   0       & \\
+    \hline R3B  &   \multicolumn{2}{|c|}{Dest 1}    &   \multicolumn{2}{|c|}{Src/Base}  &   \multicolumn{2}{|c|}{Dest 2}    &   \multicolumn{2}{|c|}{Imm/Offset [6:0]}  &   \multicolumn{2}{|c|}{Func: 11xxxx}  &   \multicolumn{2}{|c|}{Type}      &   Long    &   Description \\
+    
+    
+    \hline          \multicolumn{15}{|c|}{} \\
+    
+                    \multicolumn{15}{|c|}{Multiplication and Division} \\   
+    \hline muli &   \multicolumn{2}{|c|}{rdH}       &   \multicolumn{2}{|c|}{rs}        &   \multicolumn{2}{|c|}{rdL}       &   \multicolumn{2}{|c|}{imm [6:0]}         &   \multicolumn{2}{|c|}{100000}    &   \multicolumn{2}{|c|}{011}       &   0       &   Add signed \\
+    \hline mului &  \multicolumn{2}{|c|}{rdH}       &   \multicolumn{2}{|c|}{rs}        &   \multicolumn{2}{|c|}{rdL}       &   \multicolumn{2}{|c|}{imm [6:0]}         &   \multicolumn{2}{|c|}{100001}    &   \multicolumn{2}{|c|}{011}       &   0       &   Add signed \\
+    \hline divi &   \multicolumn{2}{|c|}{rdQ}       &   \multicolumn{2}{|c|}{rs}        &   \multicolumn{2}{|c|}{rdR}       &   \multicolumn{2}{|c|}{imm [6:0]}         &   \multicolumn{2}{|c|}{100010}    &   \multicolumn{2}{|c|}{011}       &   0       &   Add signed \\
+    \hline divui &  \multicolumn{2}{|c|}{rdQ}       &   \multicolumn{2}{|c|}{rs}        &   \multicolumn{2}{|c|}{rdR}       &   \multicolumn{2}{|c|}{imm [6:0]}         &   \multicolumn{2}{|c|}{100011}    &   \multicolumn{2}{|c|}{011}       &   0       &   Add signed \\
+    \hline divri &  \multicolumn{2}{|c|}{rdQ}       &   \multicolumn{2}{|c|}{rs}        &   \multicolumn{2}{|c|}{rdR}       &   \multicolumn{2}{|c|}{imm [6:0]}         &   \multicolumn{2}{|c|}{100100}    &   \multicolumn{2}{|c|}{011}       &   0       &   Add signed \\
+    \hline divrui & \multicolumn{2}{|c|}{rdQ}       &   \multicolumn{2}{|c|}{rs}        &   \multicolumn{2}{|c|}{rdR}       &   \multicolumn{2}{|c|}{imm [6:0]}         &   \multicolumn{2}{|c|}{100101}    &   \multicolumn{2}{|c|}{011}       &   0       &   Add signed \\
+    
+    
+    \hline          \multicolumn{15}{|c|}{} \\
+    
+                    \multicolumn{15}{|c|}{Load Double Words} \\ 
+    \hline ld64 &   \multicolumn{2}{|c|}{rdH}       &   \multicolumn{2}{|c|}{base}      &   \multicolumn{2}{|c|}{rdL}       &   \multicolumn{2}{|c|}{offset [6:0]}      &   \multicolumn{2}{|c|}{100110}    &   \multicolumn{2}{|c|}{011}       &   0       &   Add signed \\
+    \hline ll64 &   \multicolumn{2}{|c|}{rdH}       &   \multicolumn{2}{|c|}{base}      &   \multicolumn{2}{|c|}{rdL}       &   \multicolumn{2}{|c|}{offset [6:0]}      &   \multicolumn{2}{|c|}{100111}    &   \multicolumn{2}{|c|}{011}       &   0       &   Add signed \\
+    \hline tld64 &  \multicolumn{2}{|c|}{rdH}       &   \multicolumn{2}{|c|}{base}      &   \multicolumn{2}{|c|}{rdL}       &   \multicolumn{2}{|c|}{offset [6:0]}      &   \multicolumn{2}{|c|}{101000}    &   \multicolumn{2}{|c|}{011}       &   0       &   Add signed \\
+
+    \hline          \multicolumn{15}{c}{} \\
+    
+    
+    %
+    % R3-C
+    %
+                    \multicolumn{15}{c}{} \\
+    
+                    \multicolumn{15}{c}{R3-C: Three Source Registers, No Destination Register, Immediate/Offset} \\ 
+    \hline      &   \multicolumn{1}{l}{31}  &   27      &   \multicolumn{1}{l}{26}  &   22  &   \multicolumn{1}{l}{21}  &   17      &   \multicolumn{1}{l}{16}  &   10          &   \multicolumn{1}{l}{9}   &   4   &   \multicolumn{1}{l}{3}   &   1   &   0       & \\
+    \hline R3C  &   \multicolumn{2}{|c|}{Base}          &   \multicolumn{2}{|c|}{Src 1}     &   \multicolumn{2}{|c|}{Src 2}         &   \multicolumn{2}{|c|}{Imm/Offset [6:0]}  &   \multicolumn{2}{|c|}{Func}      &   \multicolumn{2}{|c|}{Type}      &   Long    &   Description \\
+    
+    
+    \hline          \multicolumn{15}{|c|}{} \\
+    
+                    \multicolumn{15}{|c|}{Conditional Branch} \\    
+    \hline jeqr &   \multicolumn{2}{|c|}{base}          &   \multicolumn{2}{|c|}{rs1}       &   \multicolumn{2}{|c|}{rs2}       &   \multicolumn{2}{|c|}{offset [6:0]}      &   \multicolumn{2}{|c|}{110000}    &   \multicolumn{2}{|c|}{011}       &   0       &   Add signed \\
+    \hline jner &   \multicolumn{2}{|c|}{base}          &   \multicolumn{2}{|c|}{rs1}       &   \multicolumn{2}{|c|}{rs2}       &   \multicolumn{2}{|c|}{offset [6:0]}      &   \multicolumn{2}{|c|}{110001}    &   \multicolumn{2}{|c|}{011}       &   0       &   Add signed \\
+    \hline jgtr &   \multicolumn{2}{|c|}{base}          &   \multicolumn{2}{|c|}{rs1}       &   \multicolumn{2}{|c|}{rs2}       &   \multicolumn{2}{|c|}{offset [6:0]}      &   \multicolumn{2}{|c|}{110010}    &   \multicolumn{2}{|c|}{011}       &   0       &   Add signed \\
+    \hline jger &   \multicolumn{2}{|c|}{base}          &   \multicolumn{2}{|c|}{rs1}       &   \multicolumn{2}{|c|}{rs2}       &   \multicolumn{2}{|c|}{offset [6:0]}      &   \multicolumn{2}{|c|}{110011}    &   \multicolumn{2}{|c|}{011}       &   0       &   Add signed \\
+    \hline jltr &   \multicolumn{2}{|c|}{base}          &   \multicolumn{2}{|c|}{rs1}       &   \multicolumn{2}{|c|}{rs2}       &   \multicolumn{2}{|c|}{offset [6:0]}      &   \multicolumn{2}{|c|}{110100}    &   \multicolumn{2}{|c|}{011}       &   0       &   Add signed \\
+    \hline jler &   \multicolumn{2}{|c|}{base}          &   \multicolumn{2}{|c|}{rs1}       &   \multicolumn{2}{|c|}{rs2}       &   \multicolumn{2}{|c|}{offset [6:0]}      &   \multicolumn{2}{|c|}{110101}    &   \multicolumn{2}{|c|}{011}       &   0       &   Add signed \\
+    
+    
+    \hline          \multicolumn{15}{|c|}{} \\
+    
+                    \multicolumn{15}{|c|}{Store Double Words} \\    
+    \hline st64 &   \multicolumn{2}{|c|}{base}          &   \multicolumn{2}{|c|}{rs1}       &   \multicolumn{2}{|c|}{rs2}       &   \multicolumn{2}{|c|}{offset [6:0]}      &   \multicolumn{2}{|c|}{110110}    &   \multicolumn{2}{|c|}{011}       &   0       &   Add signed \\
+    \hline sc64 &   \multicolumn{2}{|c|}{base}          &   \multicolumn{2}{|c|}{rs1}       &   \multicolumn{2}{|c|}{rs2}       &   \multicolumn{2}{|c|}{offset [6:0]}      &   \multicolumn{2}{|c|}{110111}    &   \multicolumn{2}{|c|}{011}       &   0       &   Add signed \\
+    \hline tst64 &  \multicolumn{2}{|c|}{base}          &   \multicolumn{2}{|c|}{rs1}       &   \multicolumn{2}{|c|}{rs2}       &   \multicolumn{2}{|c|}{offset [6:0]}      &   \multicolumn{2}{|c|}{111000}    &   \multicolumn{2}{|c|}{011}       &   0       &   Add signed \\
+        
+    
+    \hline          \multicolumn{15}{|c|}{} \\
+    
+                    \multicolumn{15}{|c|}{TLB Manipulation} \\  
+    \hline sitlb &  \multicolumn{2}{|c|}{base}          &   \multicolumn{2}{|c|}{rs1}       &   \multicolumn{2}{|c|}{rs2}       &   \multicolumn{2}{|c|}{offset [6:0]}      &   \multicolumn{2}{|c|}{111001}    &   \multicolumn{2}{|c|}{011}       &   0       &   Add signed \\
+    \hline sdtlb &  \multicolumn{2}{|c|}{base}          &   \multicolumn{2}{|c|}{value}     &   \multicolumn{2}{|c|}{asid}      &   \multicolumn{2}{|c|}{offset [6:0]}      &   \multicolumn{2}{|c|}{111010}    &   \multicolumn{2}{|c|}{011}       &   0       &   Add signed \\
+    
+    
+    \hline
+    \end{longtable}
+    \end{center}
+    
+    
+    \subsection{R4 Instructions}
+    
+    \begin{center}
+    \begin{longtable}{|c|l|r|l|r|l|r|l|r|l|r|l|r|l|r|c|c|}
+    \caption{List of R4 Instructions}
+    \label{table:r4_instr} \\
+
+                    \multicolumn{17}{c}{R4: Two Source Registers, Two Destination Registers, Immediate} \\
+    \hline      &   \multicolumn{1}{l}{31}  &   27      &   \multicolumn{1}{l}{26}  &   22  &   \multicolumn{1}{l}{21}  &   17      &   \multicolumn{1}{l}{16}  &   12      &   \multicolumn{1}{l}{11}  &   10  &   \multicolumn{1}{l}{9}   &   4   &   \multicolumn{1}{l}{3}   &   1   &   0       & \\
+    \hline R4   &   \multicolumn{2}{|c|}{Dest High/1}   &   \multicolumn{2}{|c|}{Src 1}     &   \multicolumn{2}{|c|}{Src 2}         &   \multicolumn{2}{|c|}{Dest Low/2}    &   \multicolumn{2}{|c|}{Imm [1:0]} &   \multicolumn{2}{|c|}{Func}      &   \multicolumn{2}{|c|}{Type}  &   Long    &   Description \\
+
+
+    \hline          \multicolumn{17}{|c|}{} \\
+    
+                    \multicolumn{17}{|c|}{Multiplication and Division} \\
+    \hline mul  &   \multicolumn{2}{|c|}{rdH}           &   \multicolumn{2}{|c|}{rs1}       &   \multicolumn{2}{|c|}{rs2}       &   \multicolumn{2}{|c|}{rdL}   &   \multicolumn{2}{|c|}{0} &   \multicolumn{2}{|c|}{000000}    &   \multicolumn{2}{|c|}{100}   &   0   &   Multiply, signed \\
+    \hline mulu &   \multicolumn{2}{|c|}{rdH}           &   \multicolumn{2}{|c|}{rs1}       &   \multicolumn{2}{|c|}{rs2}       &   \multicolumn{2}{|c|}{rdL}   &   \multicolumn{2}{|c|}{0} &   \multicolumn{2}{|c|}{000001}    &   \multicolumn{2}{|c|}{100}   &   0   &   Multiply, unsigned \\
+    \hline div  &   \multicolumn{2}{|c|}{rdH}           &   \multicolumn{2}{|c|}{rs1}       &   \multicolumn{2}{|c|}{rs2}       &   \multicolumn{2}{|c|}{rdL}   &   \multicolumn{2}{|c|}{0} &   \multicolumn{2}{|c|}{000010}    &   \multicolumn{2}{|c|}{100}   &   0   &   Divide, signed \\
+    \hline divu &   \multicolumn{2}{|c|}{rdH}           &   \multicolumn{2}{|c|}{rs1}       &   \multicolumn{2}{|c|}{rs2}       &   \multicolumn{2}{|c|}{rdL}   &   \multicolumn{2}{|c|}{0} &   \multicolumn{2}{|c|}{000011}    &   \multicolumn{2}{|c|}{100}   &   0   &   Divide, unsigned \\
+        
+            
+    \hline
+    \end{longtable}
+    \end{center}
+    
+    
+    \subsection{Pseudo Instructions}
+    
+    \begin{center}
+    \begin{longtable}{|c|c|c|}
+    \caption{List of Pseudo Instructions}
+    \label{table:pseudo_instr} \\
+
+    \hline Pseudo           &   Original    &   Description \\
+
+    \hline mov rd, rs       &   ori rd, rs, 0                           & \\
+    \hline ret              &   jmpr 0(ra)                              & \\
+    \hline pushN rs         &   stN rs, 0(sp); subi sp, sp, log(N)      & \\
+    \hline popN rd          &   ldN rd, 0(sp); addi sp, sp, log(N)      & \\
+    \hline enter            &   push ra; push bp; mov bp, sp            & \\
+    \hline leave            &   mov sp, bp; pop bp, pop ra              & \\
+            
+    \hline
+    \end{longtable}
+    \end{center}
+
+\section{Floating-Point}
+
+\end{document}
